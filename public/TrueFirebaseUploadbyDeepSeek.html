@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema NoSQL com Firebase Database</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button.delete {
+            background-color: #e74c3c;
+        }
+
+        button.delete:hover {
+            background-color: #c0392b;
+        }
+
+        .data-section {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .db-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .db-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema NoSQL com Firebase Database</h1>
+        
+        <!-- Seção de informações e ações do banco -->
+        <div class="db-info">
+            <div>
+                <h3>Firebase Realtime Database</h3>
+                <p>Os dados são armazenados em tempo real no Firebase.</p>
+            </div>
+            <div class="db-actions">
+                <button id="exportBtn">Exportar JSON</button>
+                <button id="clearBtn" class="delete">Limpar Banco</button>
+            </div>
+        </div>
+
+        <!-- Seção para adicionar/editar documentos -->
+        <div class="form-section">
+            <h2 id="form-title">Adicionar Documento</h2>
+            <div id="message" class="message" style="display: none;"></div>
+            
+            <form id="document-form">
+                <div class="form-group">
+                    <label for="collection">Coleção:</label>
+                    <select id="collection" required>
+                        <option value="">Selecione uma coleção</option>
+                        <option value="users">Usuários</option>
+                        <option value="products">Produtos</option>
+                        <option value="orders">Pedidos</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="document-id">ID do Documento (opcional):</label>
+                    <input type="text" id="document-id" placeholder="Deixe em branco para gerar automaticamente">
+                </div>
+                
+                <div class="form-group">
+                    <label for="document-data">Dados do Documento (JSON):</label>
+                    <textarea id="document-data" placeholder='Exemplo: {"nome": "João", "idade": 30}' required></textarea>
+                </div>
+                
+                <button type="submit" id="submit-btn">Salvar Documento</button>
+                <button type="button" id="cancel-edit" style="display: none;">Cancelar Edição</button>
+            </form>
+        </div>
+
+        <!-- Seção para consultar documentos -->
+        <div class="form-section">
+            <h2>Consultar Documentos</h2>
+            
+            <div class="form-group">
+                <label for="query-collection">Coleção:</label>
+                <select id="query-collection">
+                    <option value="">Todas as coleções</option>
+                    <option value="users">Usuários</option>
+                    <option value="products">Produtos</option>
+                    <option value="orders">Pedidos</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="query-filter">Filtro (campo e valor):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="query-field" placeholder="Campo (ex: nome)" style="flex: 1;">
+                    <input type="text" id="query-value" placeholder="Valor (ex: João)" style="flex: 1;">
+                </div>
+            </div>
+            
+            <button id="query-btn">Consultar</button>
+            <button id="clear-query" style="background-color: #95a5a6;">Limpar Filtro</button>
+        </div>
+
+        <!-- Seção para exibir resultados -->
+        <div class="data-section">
+            <h2>Documentos</h2>
+            <div id="results-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO DO FIREBASE
+        // ============================================
+
+        // 🔧 CONFIGURAÇÃO: Substitua com as configurações do seu projeto Firebase
+        /*const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO.firebaseio.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };*/
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyDatRi3H3rN3mDGfwZghuAGax-n5A2ph0o",
+  authDomain: "exemplofire-67588.firebaseapp.com",
+  databaseURL: "https://exemplofire-67588-default-rtdb.firebaseio.com",
+  projectId: "exemplofire-67588",
+  storageBucket: "exemplofire-67588.firebasestorage.app",
+  messagingSenderId: "14529819956",
+  appId: "1:14529819956:web:0178d9af752c16cdfda161",
+  measurementId: "G-4LH72JVCRB"
+};
+
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Referência para o Realtime Database
+        const database = firebase.database();
+
+        // ============================================
+        // CLASSE PARA GERENCIAR O BANCO DE DADOS
+        // ============================================
+
+        class FirebaseNoSQL {
+            constructor() {
+                this.database = database;
+            }
+
+            // 📝 CREATE: Cria um documento em uma coleção
+            async create(collection, document, id = null) {
+                try {
+                    // Se nenhum ID for fornecido, gera um ID único
+                    if (!id) {
+                        id = this.generateId();
+                    }
+                    
+                    // Verifica se o documento já existe
+                    const snapshot = await database.ref(`${collection}/${id}`).once('value');
+                    if (snapshot.exists()) {
+                        throw new Error(`Documento com ID ${id} já existe na coleção ${collection}`);
+                    }
+                    
+                    // Salva o documento no Firebase
+                    await database.ref(`${collection}/${id}`).set({
+                        ...document,
+                        _id: id,
+                        _createdAt: new Date().toISOString()
+                    });
+                    
+                    return id;
+                } catch (error) {
+                    throw new Error(`Erro ao criar documento: ${error.message}`);
+                }
+            }
+
+            // 📖 READ: Lê documentos de uma coleção com filtro opcional
+            async read(collection = null, field = null, value = null) {
+                try {
+                    let results = {};
+                    
+                    if (collection) {
+                        // Lê uma coleção específica
+                        const snapshot = await database.ref(collection).once('value');
+                        results[collection] = snapshot.val() || {};
+                    } else {
+                        // Lê todas as coleções
+                        const snapshot = await database.ref().once('value');
+                        results = snapshot.val() || {};
+                    }
+                    
+                    // Aplica filtro se fornecido
+                    if (field && value) {
+                        results = this._applyFilter(results, field, value);
+                    }
+                    
+                    return results;
+                } catch (error) {
+                    throw new Error(`Erro ao ler documentos: ${error.message}`);
+                }
+            }
+
+            // ✏️ UPDATE: Atualiza um documento existente
+            async update(collection, id, updates) {
+                try {
+                    // Verifica se o documento existe
+                    const snapshot = await database.ref(`${collection}/${id}`).once('value');
+                    if (!snapshot.exists()) {
+                        throw new Error(`Documento com ID ${id} não existe na coleção ${collection}`);
+                    }
+                    
+                    // Atualiza o documento
+                    await database.ref(`${collection}/${id}`).update({
+                        ...updates,
+                        _updatedAt: new Date().toISOString()
+                    });
+                    
+                    return true;
+                } catch (error) {
+                    throw new Error(`Erro ao atualizar documento: ${error.message}`);
+                }
+            }
+
+            // 🗑️ DELETE: Exclui um documento
+            async delete(collection, id) {
+                try {
+                    // Verifica se o documento existe
+                    const snapshot = await database.ref(`${collection}/${id}`).once('value');
+                    if (!snapshot.exists()) {
+                        throw new Error(`Documento com ID ${id} não existe na coleção ${collection}`);
+                    }
+                    
+                    // Remove o documento
+                    await database.ref(`${collection}/${id}`).remove();
+                    return true;
+                } catch (error) {
+                    throw new Error(`Erro ao excluir documento: ${error.message}`);
+                }
+            }
+
+            // 📤 EXPORT: Exporta o banco de dados completo como JSON
+            async exportDatabase() {
+                try {
+                    const snapshot = await database.ref().once('value');
+                    const data = snapshot.val() || {};
+                    return JSON.stringify(data, null, 2);
+                } catch (error) {
+                    throw new Error(`Erro ao exportar dados: ${error.message}`);
+                }
+            }
+
+            // 🧹 CLEAR: Limpa todo o banco de dados
+            async clearDatabase() {
+                try {
+                    await database.ref().set({});
+                    return true;
+                } catch (error) {
+                    throw new Error(`Erro ao limpar banco de dados: ${error.message}`);
+                }
+            }
+
+            // 🔍 LISTEN: Escuta mudanças em tempo real em uma coleção
+            listen(collection, callback) {
+                database.ref(collection).on('value', (snapshot) => {
+                    callback(snapshot.val() || {});
+                });
+            }
+
+            // 🆔 GENERATE ID: Gera um ID único
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+
+            // 🔧 APPLY FILTER: Aplica filtro aos resultados
+            _applyFilter(data, field, value) {
+                const filtered = {};
+                
+                for (const collection in data) {
+                    filtered[collection] = {};
+                    
+                    for (const id in data[collection]) {
+                        const doc = data[collection][id];
+                        
+                        // Verifica se o campo existe e corresponde ao valor
+                        if (doc[field] !== undefined && 
+                            doc[field].toString().toLowerCase().includes(value.toLowerCase())) {
+                            filtered[collection][id] = doc;
+                        }
+                    }
+                    
+                    // Remove coleções vazias
+                    if (Object.keys(filtered[collection]).length === 0) {
+                        delete filtered[collection];
+                    }
+                }
+                
+                return filtered;
+            }
+        }
+
+        // ============================================
+        // INTERFACE DO USUÁRIO E INTERAÇÃO
+        // ============================================
+
+        // Inicializa o banco de dados
+        const db = new FirebaseNoSQL();
+
+        // Elementos DOM
+        const documentForm = document.getElementById('document-form');
+        const collectionSelect = document.getElementById('collection');
+        const documentIdInput = document.getElementById('document-id');
+        const documentDataTextarea = document.getElementById('document-data');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        const formTitle = document.getElementById('form-title');
+        const messageDiv = document.getElementById('message');
+        const queryCollectionSelect = document.getElementById('query-collection');
+        const queryFieldInput = document.getElementById('query-field');
+        const queryValueInput = document.getElementById('query-value');
+        const queryBtn = document.getElementById('query-btn');
+        const clearQueryBtn = document.getElementById('clear-query');
+        const resultsContainer = document.getElementById('results-container');
+        const exportBtn = document.getElementById('exportBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        // Variáveis para controle de estado
+        let isEditing = false;
+        let currentEditId = null;
+        let currentEditCollection = null;
+
+        // 📢 Função para exibir mensagens
+        function showMessage(text, type = 'success') {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // ✅ Função para validar JSON
+        function isValidJSON(str) {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 📋 Função para processar o envio do formulário
+        documentForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const collection = collectionSelect.value;
+            const documentId = documentIdInput.value.trim();
+            const documentData = documentDataTextarea.value.trim();
+            
+            // Validações
+            if (!collection) {
+                showMessage('Por favor, selecione uma coleção', 'error');
+                return;
+            }
+            
+            if (!isValidJSON(documentData)) {
+                showMessage('Os dados do documento devem ser um JSON válido', 'error');
+                return;
+            }
+            
+            try {
+                const parsedData = JSON.parse(documentData);
+                
+                if (isEditing) {
+                    // Modo edição - atualiza o documento
+                    await db.update(currentEditCollection, currentEditId, parsedData);
+                    showMessage('Documento atualizado com sucesso!');
+                    cancelEdit();
+                } else {
+                    // Modo criação - adiciona novo documento
+                    const id = await db.create(collection, parsedData, documentId || null);
+                    showMessage(`Documento criado com sucesso! ID: ${id}`);
+                    documentForm.reset();
+                }
+                
+                // Atualiza a exibição dos resultados
+                await performQuery();
+            } catch (error) {
+                showMessage(`Erro: ${error.message}`, 'error');
+            }
+        });
+
+        // 🔍 Função para executar uma consulta
+        async function performQuery() {
+            const collection = queryCollectionSelect.value || null;
+            const field = queryFieldInput.value.trim();
+            const value = queryValueInput.value.trim();
+            
+            try {
+                const results = await db.read(collection, field || null, value || null);
+                displayResults(results);
+            } catch (error) {
+                showMessage(`Erro na consulta: ${error.message}`, 'error');
+            }
+        }
+
+        // 👁️ Função para exibir os resultados da consulta
+        function displayResults(results) {
+            if (Object.keys(results).length === 0) {
+                resultsContainer.innerHTML = '<p>Nenhum documento encontrado.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            for (const collection in results) {
+                html += `<h3>Coleção: ${collection}</h3>`;
+                html += '<table>';
+                html += '<thead><tr><th>ID</th><th>Dados</th><th>Ações</th></tr></thead>';
+                html += '<tbody>';
+                
+                for (const id in results[collection]) {
+                    html += `<tr>`;
+                    html += `<td>${id}</td>`;
+                    html += `<td><pre>${JSON.stringify(results[collection][id], null, 2)}</pre></td>`;
+                    html += `<td class="actions">
+                                <button onclick="editDocument('${collection}', '${id}')">Editar</button>
+                                <button onclick="deleteDocument('${collection}', '${id}')" class="delete">Excluir</button>
+                             </td>`;
+                    html += `</tr>`;
+                }
+                
+                html += '</tbody></table>';
+            }
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // ✏️ Função para editar um documento
+        window.editDocument = async function(collection, id) {
+            try {
+                const results = await db.read(collection);
+                const document = results[collection][id];
+                
+                if (!document) {
+                    showMessage('Documento não encontrado', 'error');
+                    return;
+                }
+                
+                // Remove campos internos do Firebase
+                const { _id, _createdAt, _updatedAt, ...cleanDocument } = document;
+                
+                // Preenche o formulário com os dados do documento
+                collectionSelect.value = collection;
+                documentIdInput.value = id;
+                documentDataTextarea.value = JSON.stringify(cleanDocument, null, 2);
+                
+                // Altera para modo edição
+                isEditing = true;
+                currentEditId = id;
+                currentEditCollection = collection;
+                formTitle.textContent = 'Editando Documento';
+                submitBtn.textContent = 'Atualizar Documento';
+                cancelEditBtn.style.display = 'inline-block';
+                
+                // Rola até o formulário
+                documentForm.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                showMessage(`Erro ao carregar documento: ${error.message}`, 'error');
+            }
+        };
+
+        // ❌ Função para cancelar a edição
+        function cancelEdit() {
+            isEditing = false;
+            currentEditId = null;
+            currentEditCollection = null;
+            formTitle.textContent = 'Adicionar Documento';
+            submitBtn.textContent = 'Salvar Documento';
+            cancelEditBtn.style.display = 'none';
+            documentForm.reset();
+        }
+
+        // 🗑️ Função para excluir um documento
+        window.deleteDocument = async function(collection, id) {
+            if (confirm(`Tem certeza que deseja excluir o documento ${id} da coleção ${collection}?`)) {
+                try {
+                    await db.delete(collection, id);
+                    showMessage('Documento excluído com sucesso!');
+                    await performQuery();
+                } catch (error) {
+                    showMessage(`Erro: ${error.message}`, 'error');
+                }
+            }
+        };
+
+        // 📤 Função para exportar o banco de dados
+        exportBtn.addEventListener('click', async function() {
+            try {
+                const data = await db.exportDatabase();
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'firebase-database-export.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showMessage('Banco de dados exportado com sucesso!');
+            } catch (error) {
+                showMessage(`Erro ao exportar: ${error.message}`, 'error');
+            }
+        });
+
+        // 🧹 Função para limpar o banco de dados
+        clearBtn.addEventListener('click', async function() {
+            if (confirm('Tem certeza que deseja limpar todo o banco de dados? Esta ação não pode ser desfeita.')) {
+                try {
+                    await db.clearDatabase();
+                    showMessage('Banco de dados limpo com sucesso!');
+                    await performQuery();
+                } catch (error) {
+                    showMessage(`Erro ao limpar: ${error.message}`, 'error');
+                }
+            }
+        });
+
+        // 🔄 Event listeners
+        queryBtn.addEventListener('click', performQuery);
+        clearQueryBtn.addEventListener('click', function() {
+            queryFieldInput.value = '';
+            queryValueInput.value = '';
+            performQuery();
+        });
+        cancelEditBtn.addEventListener('click', cancelEdit);
+
+        // 👂 Configura escuta em tempo real para atualizações
+        db.listen('', function(data) {
+            console.log('Dados atualizados em tempo real:', data);
+            // Atualiza a interface se necessário
+            performQuery();
+        });
+
+        // 🚀 Executa uma consulta inicial ao carregar a página
+        performQuery();
+
+        console.log("Sistema NoSQL com Firebase inicializado com sucesso!");
+    </script>
+</body>
+</html>

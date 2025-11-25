@@ -1,0 +1,33 @@
+Vou fornecer duas funções:
+
+Para upload no Firebase Storage (requer configuração do Firebase no seu projeto)
+
+Para upload em um backend hipotético que salva a imagem em um servidor e armazena o caminho no SQLite.
+
+No caso do Firebase, você precisa ter o Firebase configurado no seu projeto.
+
+Vamos começar com o Firebase:
+
+Primeiro, inclua a SDK do Firebase no seu HTML (substitua pelos seus próprios valores de configuração):
+
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+E configure o Firebase:
+
+<script> const firebaseConfig = { apiKey: "sua-api-key", authDomain: "seu-auth-domain", projectId: "seu-project-id", storageBucket: "seu-storage-bucket", messagingSenderId: "seu-messaging-sender-id", appId: "seu-app-id" }; firebase.initializeApp(firebaseConfig); </script>
+Agora, a função para upload no Firebase Storage:
+
+Observação: Assumindo que imagensArray[0] é um objeto que tem a propriedade src como DataURL.
+Vamos converter o DataURL para um Blob e fazer o upload.
+
+Para o backend com SQLite, vamos simular uma requisição POST para um servidor que aceita a imagem.
+
+Vamos criar uma função genérica para converter DataURL para Blob:
+
+Vamos criar duas funções:
+
+-uploadParaFirebase(dataURL, nomeArquivo)
+
+-uploadParaBackend(dataURL, nomeArquivo)
+
+No entanto, note que o SQLite não é adequado para armazenar imagens diretamente, então normalmente armazenamos a imagem em um sistema de arquivos e guardamos o caminho no SQLite.
+Portanto, a função uploadParaBackend vai enviar a imagem para um servidor, que por sua vez salva a imagem em disco e armazena o caminho no SQLite.

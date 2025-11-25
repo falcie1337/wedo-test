@@ -1,0 +1,52 @@
+USANDO STITCH
+HFS - app pra teste local de website
+
+Me gere a tela abaixo com foco em responsividade, uma paleta de cores madeira, estilo moderno e simples, com espaço para conectar e receber informações de bancos de dados
+
+1 TELA DE GERENTE
+
+infos :
+NOME DA OBRA - info de texto
+LOCALIZAÇÃO -  info texto
+DATA INICIAL - data
+DATA PREVISTA FINAL - data
+STATUS - em andamento, concluido = checkbox
+OPERADORES ENVOLVIDOS - info de texto com botao de adicionar e uma lista em baixo
+DESCRIÇÃO - info de texto
+NOME DO CLIENTE - info de texto
+EMAIL DO CLIENTE - info de texto
+WHATSAPP - numero
+
+Me gere a tela abaixo com foco em responsividade, uma paleta de cores madeira, estilo moderno e simples, com espaço para conectar e receber informações de bancos de dados
+
+1 TELA DE SELEÇÃO PROS OPERADORES
+
+onde vai aparecer uma lista de operadores puxada do banco de dados, e o operador tal vai clicar no nome dele, que vai redirecionar ele para a tela de operador daquela obra
+
+Me gere a tela abaixo com foco em responsividade, uma paleta de cores madeira, estilo moderno e simples, com espaço para conectar e receber informações de bancos de dados
+
+1 TELA DE OPERADOR - similar ao whatsapp simples, um link para cada obra
+
+infos:
+NOME DA OBRA - info texto puxada do banco de dados como tituloSTATUS - em andamento, concluído como botão de liga e desliga e pedir uma confirmação quando ele clicar em concluído.
+DIARIO DE BORDO - info de texto grande com um botao de enviar do lado, como um chatbot, com um botao de enviar foto do lado
+DIA - AUTOMATICAMENTE - puxado de javascript
+- quando o status for concluido, ele puxa a obra pelo nome da obra e nome do cliente do banco de dados, para puxar o email do cliente e enviar para ele de forma automoatica por essa tela
+
+
+Me gere a tela abaixo com foco em responsividade, uma paleta de cores madeira, estilo moderno e simples, com espaço para conectar e receber informações de bancos de dados
+
+1 TELA DE FORMS FEEDBACK DO CLIENTE
+
+infos:
+NOME DA OBRA - info de texto
+NOME COMPLETO - info de texto
+AVALIAÇÃO GERAL - nota de 0-10
+OBSERVAÇÕES - info de texto opcional
+
+Obs == se atentar ao uso de bibs externas, geralmente cdn serve, mas tem que ser link, confiável e solido
+
+PROXIMAS ETAPAS DPS DO DESIGN
+
+SISTEMA DE BANCO DE DADOS SQL
+FAZER JAVASCRIPT PARA PUXAR INFOS PRO SITE

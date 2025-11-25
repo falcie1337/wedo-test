@@ -1,0 +1,127 @@
+/* -------------------------- */
+/*  PALETA E ESTILOS GLOBAIS  */
+/* -------------------------- */
+/* Cor Principal: #4B341C */
+:root {
+    --main-color: #4B341C;
+    --main-color-hover: #3a2916; /* Um pouco mais escuro para o hover */
+    --light-bg: #f4f4f9;
+    --dark-accent: #333;
+    --error-color: #ff6347; /* Mantido para o botão de fechar/reload */
+}
+
+/* Estilo para o corpo e o container principal */
+body {
+    display: flex;
+    justify-content: center; /* Centraliza o container horizontalmente */
+    align-items: center; /* Centraliza o container verticalmente */
+    min-height: 100vh; /* Garante altura total da viewport */
+    margin: 0;
+    background-color: var(--light-bg); /* Fundo suave */
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centraliza itens como <video> e <canvas> */
+    width: 90%; /* Largura máxima do container */
+    max-width: 600px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative; /* Necessário para posicionar o botão de reload */
+}
+
+/* Estilo para o <video> e <canvas> */
+#video, #photo {
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+    border: 2px solid var(--dark-accent);
+    border-radius: 8px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Oculta o parágrafo de "Sua foto" */
+.container p {
+    display: none;
+}
+
+/* --- Estilo dos Botões --- */
+
+/* Estilo Base para todos os botões */
+button {
+    cursor: pointer;
+    font-size: 1.2rem; /* Reduz o tamanho do ícone/fonte */
+    padding: 8px 12px; /* Reduz o padding do botão */
+    border: none;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; /* Cor do ícone */
+}
+
+/* 1. Botão de Reload/Fechar (Ícone 'X') */
+#reload {
+    /* Posicionamento Fixo no Topo/Centro */
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%); 
+    
+    background-color: var(--error-color); 
+    border-radius: 50%; /* Torna o botão perfeitamente redondo */
+    width: 35px; /* Menor */
+    height: 35px; /* Menor */
+    font-size: 1.3rem; /* Ícone do reload ligeiramente menor */
+    z-index: 10;
+    padding: 0;
+    line-height: 1;
+}
+
+#reload:hover {
+    background-color: #e55337;
+    transform: translateX(-50%) scale(1.05);
+}
+
+/* 2. Container para os botões de ação (LADO A LADO) */
+.botoes-acao {
+    display: flex; /* Habilita Flexbox */
+    justify-content: center; /* Centraliza o grupo de botões */
+    width: 100%;
+    margin-top: 15px; /* Espaço entre o canvas e os botões */
+}
+
+/* 3. Estilo para os botões de ação (Câmera e Enviar) */
+#cameraAction, #downloadZip {
+    /* Removido max-width/min-width para usar o padding e deixar o tamanho mais natural */
+    margin: 0 10px; /* Espaçamento entre eles */
+    border-radius: 50px; /* Botões totalmente arredondados nas bordas */
+    
+    /* APLICAÇÃO DA COR PRINCIPAL #4B341C */
+    background-color: var(--main-color);
+}
+
+/* Estilo de Hover */
+#cameraAction:hover, #downloadZip:hover {
+    background-color: var(--main-color-hover);
+    transform: scale(1.05);
+}
+.flexbtns{
+    display: flex;
+}
+/* Garante que os ícones do Material Icons sejam visíveis e em tamanho adequado */
+.material-icons {
+    font-size: 1.5rem; /* Ajuste para o novo tamanho menor do botão */
+}
+.disabled{
+    display: none;
+}
+#previewCanvas{
+    display: block;
+}

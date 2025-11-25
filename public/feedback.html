@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Formulário de Avaliação</title>
+<link rel="stylesheet" href="../css/main.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4B341C", // dark oak
+              "secondary": "#DEB887", // sandy brown
+              "text-primary": "#3D2B1F", // deep brown
+              "text-secondary": "#856d4b",
+              "background": "#ffff", // light cream
+              "input-border": "#E0D6C3",
+              "input-bg": "#FFFFFF",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+    <div class="main">
+
+      <!-- link já vai automatico com nome do cliente, da obra -->
+
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-10 flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between border-b border-input-border-light dark:border-input-border-dark">
+<div class="text-text-primary dark:text-background-light flex size-10 shrink-0 items-center justify-center">
+    
+</div>
+<h2 class="text-text-primary dark:text-background-light text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Formulário de Feedback</h2>
+<div class="flex size-10 shrink-0 items-center justify-center"></div>
+</div>
+<main class="flex-1 px-4 py-6">
+<!-- Headline and Body Text -->
+<h1 class="text-text-primary dark:text-background-light tracking-tight text-[32px] font-bold leading-tight text-left pb-1">Feedback do Cliente</h1>
+<p class="text-text-secondary dark:text-secondary text-base font-normal leading-normal pb-6">Preencha os detalhes do projeto e sua avaliação.</p>
+<!-- Form Section: Detalhes do Projeto -->
+<div class="space-y-6">
+<h3 class="text-text-primary dark:text-background-light text-xl font-semibold leading-normal">Detalhes do Projeto</h3>
+<!-- 
+Nome completo e nome da obra serão pegos automaticamente já que será enviado para o cliente
+-->
+<!-- Text Field: NOME DA OBRA -->
+<label class="flex flex-col w-full">
+<p class="text-text-primary dark:text-secondary text-base font-medium leading-normal pb-2">NOME DA OBRA</p>
+<input id="obraIp" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary dark:text-background-light focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark h-14 placeholder:text-text-secondary/70 p-[15px] text-base font-normal leading-normal" placeholder="Insira o nome da obra" value="Automatico" disabled/>
+</label>
+<!-- Text Field: NOME COMPLETO -->
+<label class="flex flex-col w-full">
+<p class="text-text-primary dark:text-secondary text-base font-medium leading-normal pb-2">NOME COMPLETO</p>
+<input id="nomeIp" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-text-primary dark:text-background-light focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark h-14 placeholder:text-text-secondary/70 p-[15px] text-base font-normal leading-normal" placeholder="Insira seu nome completo" disabled value="automatico"/>
+</label>
+</div>
+<!-- Divider -->
+<div class="my-8 h-px bg-input-border-light dark:bg-input-border-dark"></div>
+
+<!-- Form Section: Sua Avaliação -->
+<div class="space-y-4">
+<h3 id="avaliacaoshowtext" class="text-text-primary dark:text-background-light text-xl font-semibold leading-normal">Sua Avaliação</h3>
+
+<!-- Rating Input Component -->
+<div class="flex flex-col w-full gap-3" id="feedbackNota">
+<p class="text-text-primary dark:text-secondary text-base font-medium leading-normal">AVALIAÇÃO GERAL</p>
+<div class="flex items-center justify-between gap-1">
+<span class="text-sm font-semibold text-text-secondary dark:text-secondary">1</span>
+<div class="flex flex-1 items-center justify-between px-2" >
+<button value="0" class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="1"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="2"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="3"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="4"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="5"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="6"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>  
+
+<button  value="7"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="7"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="8"  class="flex size-7 items-center justify-center rounded-full border-2 border-secondary bg-transparent text-secondary dark:border-secondary dark:bg-transparent dark:text-secondary transition-colors duration-200 hover:bg-secondary/20"></button>
+<button  value="9" class=""></button>
+</div>
+<span class="text-sm font-semibold text-text-secondary dark:text-secondary">10</span>
+</div>
+</div>
+</div>
+
+<!-- Divider -->
+<div class="my-8 h-px bg-input-border-light dark:bg-input-border-dark"></div>
+<!-- Form Section: Comentários Adicionais -->
+<div class="space-y-6">
+<h3 class="text-text-primary dark:text-background-light text-xl font-semibold leading-normal">Comentários Adicionais</h3>
+<!-- Text Area -->
+<label class="flex flex-col w-full">
+<p class="text-text-primary dark:text-secondary text-base font-medium leading-normal pb-2">OBSERVAÇÕES (Opcional)</p>
+<textarea id="adicionalComent" class="form-textarea flex w-full min-w-0 flex-1 resize-y overflow-hidden rounded-lg text-text-primary dark:text-background-light focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-input-border-light dark:border-input-border-dark bg-input-bg-light dark:bg-input-bg-dark min-h-32 placeholder:text-text-secondary/70 p-[15px] text-base font-normal leading-normal" placeholder="Deixe seus comentários aqui..."></textarea>
+</label>
+</div>
+</main>
+<!-- Sticky Footer for CTA and Status -->
+<footer class="sticky bottom-0 z-10 space-y-4 bg-background-light dark:bg-background-dark p-4 pt-2 border-t border-input-border-light dark:border-input-border-dark">
+
+    <!-- Status Indicator -->
+     <!-- 
+<div class="flex items-center justify-center gap-2">
+<div class="size-2 rounded-full bg-green-500"></div>
+<p class="text-sm font-medium text-green-700 dark:text-green-400">Online</p>
+</div>
+    
+     -->
+
+<!-- CTA Button -->
+<button onclick="coletardata()" id="submitFeedback" class="flex h-14 w-full items-center justify-center gap-x-2 rounded-xl bg-primary px-6 text-base font-bold text-white shadow-sm transition-all duration-200 hover:bg-primary/90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60">
+                Enviar Feedback
+            </button>
+</footer>
+</div>
+    </div>
+
+    
+<script src="../javascript/feedback.js"></script>
+<script src="../javascript/main.js"></script>
+</body></html>

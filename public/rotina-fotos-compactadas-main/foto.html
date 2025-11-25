@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câmera + ZIP</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        
+        <button id="reload" onclick="Reload()">
+            <i class="material-icons">close</i> 
+        </button>
+        
+        <video id="video" autoplay playsinline></video>
+        
+        <p>Sua foto</p>
+        <canvas id="photo"></canvas>
+        <div class="flexbtns">
+
+        <button id="cameraAction" >
+            <i class="material-icons">photo_camera</i>
+        </button>
+        
+        <button id="downloadZip">
+            <i class="material-icons">send</i> </button>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <script type="module">
+        // Importa a função initCameraRoutine do módulo ES
+        import { initCameraRoutine } from './cameraRoutine.mjs';
+
+        // Inicializa a rotina, passando os IDs dos elementos da tela
+        const camera = initCameraRoutine({
+            cameraButtonId: 'cameraAction', // ID do botão principal
+            downloadButtonId: 'downloadZip', // ID do botão de download ZIP
+            videoId: 'video', // ID do elemento <video>
+            canvasId: 'photo', // ID do elemento <canvas>
+            // galleryId: 'gallery', // ID da div da galeria
+            textos: { // Textos opcionais do botão principal
+                ligar: '', 
+                fotografar: '' 
+            }
+        });
+    </script>
+</body>
+</html>

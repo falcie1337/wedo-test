@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Fotos - SQLite & Firebase</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .upload-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+
+        .camera-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .preview-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            border: 2px dashed #3498db;
+            display: none;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #219a52;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d68910;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            text-align: center;
+            display: none;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .file-input {
+            margin: 15px 0;
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            padding: 10px 20px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload de Fotos - SQLite & Firebase</h1>
+        
+        <!-- Seção de Upload -->
+        <div class="upload-section">
+            <h2>Tirar ou Carregar Foto</h2>
+            
+            <!-- Container da Câmera -->
+            <div class="camera-container">
+                <video id="video" autoplay playsinline></video>
+                <canvas id="canvas"></canvas>
+            </div>
+
+            <!-- Prévia da Foto -->
+            <div class="preview-container">
+                <img id="preview" alt="Prévia da foto">
+            </div>
+
+            <!-- Botões da Câmera -->
+            <div class="buttons">
+                <button id="startCamera" class="btn-primary">Iniciar Câmera</button>
+                <button id="captureBtn" class="btn-success" disabled>Capturar Foto</button>
+                <button id="retakeBtn" class="btn-warning" style="display: none;">Tirar Outra</button>
+            </div>
+
+            <!-- Upload de Arquivo -->
+            <div class="file-input">
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                <button id="selectFile" class="btn-primary">Selecionar Arquivo</button>
+            </div>
+
+            <!-- Opções de Upload -->
+            <div class="upload-options">
+                <div class="option-btn active" data-target="sqlite">SQLite</div>
+                <div class="option-btn" data-target="firebase">Firebase</div>
+            </div>
+
+            <!-- Botão de Upload -->
+            <div class="buttons">
+                <button id="uploadBtn" class="btn-success" disabled>Fazer Upload</button>
+                <button id="clearBtn" class="btn-danger">Limpar</button>
+            </div>
+
+            <!-- Status do Upload -->
+            <div id="status" class="status"></div>
+        </div>
+
+        <!-- Galeria de Fotos -->
+        <div id="gallerySection" style="display: none;">
+            <h2>Fotos Salvas</h2>
+            <div id="gallery" class="gallery"></div>
+        </div>
+    </div>
+<!-- O CONTRA DESSE CODIGO AQUI É QUE O STORAGE DO FIREBASE É PAGO -->
+    <script src="../rotina-fotos-compactadas-main/cameraRoutine.mjs"></script>
+    <!-- Firebase SDK (adicione suas credenciais) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
+    <script>
+        // ============================================
+        // CONFIGURAÇÃO E VARIÁVEIS GLOBAIS
+        // ============================================
+
+        // Array para armazenar imagens capturadas
+        let imagensArray = [];
+        
+        // Elementos DOM
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const preview = document.getElementById('preview');
+        const startCameraBtn = document.getElementById('startCamera');
+        const captureBtn = document.getElementById('captureBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const selectFileBtn = document.getElementById('selectFile');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        const gallerySection = document.getElementById('gallerySection');
+        const gallery = document.getElementById('gallery');
+        const optionBtns = document.querySelectorAll('.option-btn');
+
+        // Configuração do Firebase (SUBSTITUA pelas suas credenciais)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Inicializa Firebase (comente se não for usar Firebase)
+        try {
+            firebase.initializeApp(firebaseConfig);
+        } catch (error) {
+            console.log("Firebase não configurado: ", error);
+        }
+
+        // Tipo de upload selecionado
+        let uploadType = 'sqlite';
+
+        // ============================================
+        // CONFIGURAÇÃO DA CÂMERA
+        // ============================================
+
+        // Inicia a câmera
+        async function iniciarCamera() {
+            try {
+                // Solicita acesso à câmera
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment', // Preferência para câmera traseira
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                // Conecta o stream ao elemento de vídeo
+                video.srcObject = stream;
+                
+                // Habilita o botão de captura
+                captureBtn.disabled = false;
+                startCameraBtn.disabled = true;
+                
+                console.log("Câmera iniciada com sucesso");
+            } catch (error) {
+                console.error("Erro ao acessar a câmera:", error);
+                mostrarStatus("Erro ao acessar a câmera: " + error.message, 'error');
+            }
+        }
+
+        // Captura foto da câmera
+        function capturarFoto() {
+            const context = canvas.getContext('2d');
+            
+            // Configura o canvas com as dimensões do vídeo
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Desenha o frame atual do vídeo no canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Converte para Data URL (formato base64)
+            const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Cria objeto de imagem
+            const imagemCapturada = {
+                src: dataURL,
+                tipo: 'image/jpeg',
+                nome: `foto_${Date.now()}.jpg`,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Adiciona ao array
+            imagensArray = [imagemCapturada];
+            
+            // Mostra prévia
+            preview.src = dataURL;
+            preview.style.display = 'block';
+            
+            // Mostra botão de retake e esconde captura
+            captureBtn.style.display = 'none';
+            retakeBtn.style.display = 'inline-block';
+            uploadBtn.disabled = false;
+            
+            // Para a câmera para economizar bateria
+            pararCamera();
+            
+            console.log("Foto capturada:", imagemCapturada);
+        }
+
+        // Para a câmera
+        function pararCamera() {
+            if (video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+
+        // Tira outra foto
+        function tirarOutra() {
+            imagensArray = [];
+            preview.style.display = 'none';
+            captureBtn.style.display = 'inline-block';
+            retakeBtn.style.display = 'none';
+            uploadBtn.disabled = true;
+            iniciarCamera();
+        }
+
+        // ============================================
+        // MANIPULAÇÃO DE ARQUIVOS
+        // ============================================
+
+        // Processa arquivo selecionado
+        function processarArquivo(arquivo) {
+            return new Promise((resolve, reject) => {
+                const leitor = new FileReader();
+                
+                leitor.onload = function(e) {
+                    const imagem = {
+                        src: e.target.result,
+                        tipo: arquivo.type,
+                        nome: arquivo.name,
+                        tamanho: arquivo.size,
+                        timestamp: new Date().toISOString()
+                    };
+                    
+                    imagensArray = [imagem];
+                    preview.src = imagem.src;
+                    preview.style.display = 'block';
+                    uploadBtn.disabled = false;
+                    
+                    console.log("Arquivo processado:", imagem);
+                    resolve(imagem);
+                };
+                
+                leitor.onerror = reject;
+                leitor.readAsDataURL(arquivo);
+            });
+        }
+
+        // ============================================
+        // UPLOAD PARA SQLITE (VIA BACKEND)
+        // ============================================
+
+        // Função para upload para SQLite (requer backend)
+        async function uploadParaSQLite(imagem) {
+            try {
+                mostrarStatus("Enviando para SQLite...", 'loading');
+                
+                // SIMULAÇÃO: Substitua por sua API real
+                // Em um cenário real, você enviaria a imagem para seu backend
+                // que salvaria no SQLite e retornaria a URL ou ID
+                
+                // Exemplo de como seria com fetch:
+                /*
+                const formData = new FormData();
+                
+                // Converte Data URL para Blob
+                const response = await fetch(imagem.src);
+                const blob = await response.blob();
+                
+                formData.append('foto', blob, imagem.nome);
+                formData.append('tipo', imagem.tipo);
+                formData.append('timestamp', imagem.timestamp);
+                
+                const resultado = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!resultado.ok) {
+                    throw new Error('Erro no servidor');
+                }
+                
+                const dados = await resultado.json();
+                */
+                
+                // Simulação de delay de rede
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulação de resposta bem-sucedida
+                const respostaSimulada = {
+                    id: Math.random().toString(36).substr(2, 9),
+                    url: imagem.src, // Em produção seria URL do servidor
+                    mensagem: "Foto salva no SQLite com sucesso!",
+                    timestamp: new Date().toISOString()
+                };
+                
+                console.log("Upload SQLite bem-sucedido:", respostaSimulada);
+                mostrarStatus(respostaSimulada.mensagem, 'success');
+                
+                return respostaSimulada;
+                
+            } catch (error) {
+                console.error("Erro no upload SQLite:", error);
+                mostrarStatus("Erro ao salvar no SQLite: " + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // ============================================
+        // UPLOAD PARA FIREBASE STORAGE
+        // ============================================
+
+        // Função para upload para Firebase Storage
+        async function uploadParaFirebase(imagem) {
+            try {
+                mostrarStatus("Enviando para Firebase...", 'loading');
+                
+                // Converte Data URL para Blob
+                const resposta = await fetch(imagem.src);
+                const blob = await resposta.blob();
+                
+                // Cria referência no Storage
+                const storage = firebase.storage();
+                const nomeArquivo = `fotos/${Date.now()}_${imagem.nome}`;
+                const referencia = storage.ref().child(nomeArquivo);
+                
+                // Faz upload do arquivo
+                const snapshot = await referencia.put(blob, {
+                    contentType: imagem.tipo,
+                    customMetadata: {
+                        timestamp: imagem.timestamp,
+                        originalName: imagem.nome
+                    }
+                });
+                
+                // Obtém URL de download
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                
+                const resultado = {
+                    url: downloadURL,
+                    caminho: snapshot.ref.fullPath,
+                    nome: imagem.nome,
+                    tamanho: snapshot.totalBytes,
+                    timestamp: new Date().toISOString(),
+                    mensagem: "Foto salva no Firebase com sucesso!"
+                };
+                
+                console.log("Upload Firebase bem-sucedido:", resultado);
+                mostrarStatus(resultado.mensagem, 'success');
+                
+                return resultado;
+                
+            } catch (error) {
+                console.error("Erro no upload Firebase:", error);
+                mostrarStatus("Erro ao salvar no Firebase: " + error.message, 'error');
+                throw error;
+            }
+        }
+
+        // ============================================
+        // FUNÇÕES AUXILIARES
+        // ============================================
+
+        // Mostra status do upload
+        function mostrarStatus(mensagem, tipo) {
+            statusDiv.textContent = mensagem;
+            statusDiv.className = 'status';
+            
+            switch(tipo) {
+                case 'success':
+                    statusDiv.classList.add('status-success');
+                    break;
+                case 'error':
+                    statusDiv.classList.add('status-error');
+                    break;
+                case 'loading':
+                    statusDiv.classList.add('status-loading');
+                    statusDiv.innerHTML = mensagem + ' <div class="loading-spinner"></div>';
+                    break;
+            }
+            
+            statusDiv.style.display = 'block';
+            
+            // Esconde após 5 segundos (exceto loading)
+            if (tipo !== 'loading') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Limpa tudo
+        function limparTudo() {
+            imagensArray = [];
+            preview.style.display = 'none';
+            preview.src = '';
+            uploadBtn.disabled = true;
+            captureBtn.style.display = 'inline-block';
+            retakeBtn.style.display = 'none';
+            captureBtn.disabled = true;
+            startCameraBtn.disabled = false;
+            statusDiv.style.display = 'none';
+            fileInput.value = '';
+            
+            // Reinicia câmera se estava ativa
+            pararCamera();
+            
+            console.log("Interface limpa");
+        }
+
+        // Função principal de upload
+        async function enviarFoto() {
+            const foto = imagensArray[0];
+
+            if (!foto) {
+                mostrarStatus("Nenhuma foto foi selecionada!", 'error');
+                return;
+            }
+
+            try {
+                let resultado;
+                
+                if (uploadType === 'sqlite') {
+                    resultado = await uploadParaSQLite(foto);
+                } else {
+                    resultado = await uploadParaFirebase(foto);
+                }
+                
+                // Adiciona à galeria
+                adicionarNaGaleria(resultado);
+                
+            } catch (error) {
+                console.error("Erro no upload:", error);
+            }
+        }
+
+        // Adiciona imagem na galeria
+        function adicionarNaGaleria(dados) {
+            const item = document.createElement('div');
+            item.className = 'gallery-item';
+            
+            item.innerHTML = `
+                <img src="${dados.url}" alt="Foto salva">
+                <button class="delete-btn" onclick="removerDaGaleria(this)">×</button>
+            `;
+            
+            gallery.appendChild(item);
+            gallerySection.style.display = 'block';
+        }
+
+        // Remove imagem da galeria
+        function removerDaGaleria(botao) {
+            const item = botao.parentElement;
+            item.remove();
+            
+            // Esconde galeria se estiver vazia
+            if (gallery.children.length === 0) {
+                gallerySection.style.display = 'none';
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+
+        // Câmera
+        startCameraBtn.addEventListener('click', iniciarCamera);
+        captureBtn.addEventListener('click', capturarFoto);
+        retakeBtn.addEventListener('click', tirarOutra);
+
+        // Upload de arquivo
+        selectFileBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                processarArquivo(e.target.files[0]);
+            }
+        });
+
+        // Upload
+        uploadBtn.addEventListener('click', enviarFoto);
+        clearBtn.addEventListener('click', limparTudo);
+
+        // Seleção de tipo de upload
+        optionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                optionBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                uploadType = btn.dataset.target;
+                console.log("Tipo de upload selecionado:", uploadType);
+            });
+        });
+
+        // Inicialização
+        console.log("Sistema de upload inicializado");
+    </script>
+</body>
+</html>

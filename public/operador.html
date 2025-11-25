@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Diário de Obra</title>
+<link rel="stylesheet" href="../css/main.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#4B341C",
+          "background": "#f8f7f6"
+        },
+        fontFamily: {
+          "display": ["Manrope", "sans-serif"]
+        },
+      },
+    },
+  }
+</script>
+
+<style>
+  /* 🔒 Remove scroll do navegador */
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* Customiza a rolagem interna do chat */
+  .chat-scroll {
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    scrollbar-color: #b1b1b1 transparent;
+  }
+
+  .chat-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-scroll::-webkit-scrollbar-thumb {
+    background-color: #b1b1b1;
+    border-radius: 4px;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  }
+</style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="main">
+    
+<div class="flex flex-col h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden">
+  
+  <!-- Top App Bar -->
+  <div class="flex items-center bg-white dark:bg-background-dark/80 p-4 pb-2 justify-between border-b border-gray-200 dark:border-gray-800 backdrop-blur-sm">
+    <div class="text-gray-800 dark:text-gray-200 flex size-12 shrink-0 items-center justify-start"></div>
+    <h2 class="text-gray-900 dark:text-gray-100 text-lg font-bold text-center flex-1">Residencial Jardins - Bloco A</h2>
+    <div class="w-12 shrink-0"></div>
+  </div>
+
+  <!-- Segment Buttons -->
+  <div class="flex px-4 py-3 bg-white dark:bg-background-dark/80">
+    <div class="flex h-10 flex-1 items-center justify-center rounded-lg bg-background-light dark:bg-gray-800 p-1">
+      <label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-gray-900 has-[:checked]:text-primary text-gray-500 dark:text-gray-400 text-sm font-medium transition-all">
+        <span>Em Andamento</span>
+        <input checked class="invisible w-0" name="status-toggle" type="radio" value="Em Andamento"/>
+      </label>
+      <label class="flex cursor-pointer h-full grow items-center justify-center rounded-lg px-2 has-[:checked]:bg-white dark:has-[:checked]:bg-gray-900 has-[:checked]:text-primary text-gray-500 dark:text-gray-400 text-sm font-medium transition-all">
+        <span>Concluído</span>
+        <input class="invisible w-0" name="status-toggle" type="radio" value="Concluído"/>
+      </label>
+    </div>
+  </div>
+
+  <!-- Chat Area -->
+  <div class="flex-1 overflow-y-auto chat-scroll pb-24 px-4" id="chat-area">
+    <p class="text-gray-500 dark:text-gray-400 text-sm text-center my-3" id="horadata">--- HOJE: 24/07/2024 HORA 19:00---</p>
+
+    
+
+    <!-- Várias mensagens para mostrar o scroll -->
+    <div id="demo-messages"></div>
+
+  </div>
+
+  <!-- Input Bar -->
+  <div class="absolute bottom-0 left-0 w-full bg-white dark:bg-background-dark/80 p-4 border-t border-gray-200 dark:border-gray-800 backdrop-blur-sm">
+    <div class="flex items-center gap-2">
+      <button class="flex size-12 shrink-0 items-center justify-center rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+        <span class="material-symbols-outlined !text-2xl">add_a_photo</span>
+      </button>
+      <div class="relative flex-1">
+        <textarea class="w-full resize-none rounded-lg border-gray-300 dark:border-gray-700 bg-background-light dark:bg-gray-800 text-gray-800 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 focus:border-primary focus:ring-primary pr-12 text-base" placeholder="Descreva o progresso de hoje..." rows="1"></textarea>
+        <button class="absolute right-2 top-1/2 -translate-y-1/2 flex size-10 items-center justify-center rounded-full bg-primary text-white hover:bg-opacity-90">
+          <span class="material-symbols-outlined">send</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<!-- Script para criar mensagens de demonstração -->
+<script>
+  const chat = document.getElementById("demo-messages");
+  for (let i = 1; i <= 1; i++) {
+    chat.innerHTML += `
+      <div class="flex items-end gap-3 justify-end mb-3">
+        <div class="flex flex-col gap-1 items-end">
+          <p class="text-xs text-gray-500">Operador</p>
+          <p class="text-base bg-primary text-white rounded-xl rounded-br-lg px-4 py-3 max-w-[360px]">
+            Cheguei cedo, com o material protegido e as mãos atentas ao detalhe. Antes de tocar a parede, revisei o projeto mais uma vez, cada traço, cada cor, cada centímetro importava. Expliquei ao cliente o processo, pedi permissão para iniciar e comecei a aplicar a obra . 
+          </p>
+        </div>
+      </div>`;
+  }
+</script>
+
+</body>
+</html>

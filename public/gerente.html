@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gerenciar Obra</title>
+<link rel="stylesheet" href="../css/main.css">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<script src="../javascript/main.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="../javascript/gerente.js"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#4B341C",
+            "background": "#f8f7f6",
+            "surface": "#ffffff",
+            "text": "#181411",
+            "text-secondary": "#897561",
+            "border": "#e6e0db"
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {
+            "DEFAULT": "0.5rem",
+            "lg": "0.75rem",
+            "xl": "1rem",
+            "full": "9999px"
+          },
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+        
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+  <!-- se inspirar nesse design -->
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-light-primary dark:text-text-dark-primary">
+    <div class="main">
+
+<div class="relative flex min-h-screen w-full flex-col">
+<!-- Top App Bar -->
+<header class="sticky top-0 z-10 flex h-16 items-center border-b border-border-light dark:border-border-dark bg-surface-light/80 dark:bg-surface-dark/80 backdrop-blur-sm p-4">
+<h1 class="flex-1 text-center text-lg font-bold">Gerenciar Obra</h1>
+<button id="submitSalvar" class="px-4 py-2 text-primary text-base font-bold leading-normal tracking-wide">Salvar</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 space-y-6 p-4 pb-28">
+<!-- Section 1: Informações Gerais -->
+<section>
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-xl font-bold leading-tight tracking-tight mb-4">Informações Gerais</h2>
+<div class="space-y-4">
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Nome da Obra</p>
+<input id="nomedaobra" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="Ex: Reforma Apartamento 101" value="Residencial das Flores - Bloco B"/>
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Localização</p>
+<input id="local" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="Endereço completo da obra" value="Rua das Acácias, 123, São Paulo - SP"/>
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Descrição</p>
+<textarea id="descricao" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary min-h-36 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="Detalhes importantes sobre o projeto..."></textarea>
+</label>
+</div>
+</section>
+<!-- Section 2: Prazos e Status -->
+<section>
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-xl font-bold leading-tight tracking-tight mb-4">Prazos e Status</h2>
+<div class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Data Inicial</p>
+<div class="relative">
+<input id="datainicial" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal pr-10" type="date" value="2024-08-01"/>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary">calendar_today</span>
+</div>
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Data Final</p>
+<div class="relative">
+<input id="datafinal" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal pr-10" type="date" value="2025-02-28"/>
+<span class="material-symbols-outlined pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-text-light-secondary dark:text-text-dark-secondary">calendar_today</span>
+</div>
+</label>
+</div>
+<!--  seção de status andamento ou concluido
+
+<div>
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Status</p>
+<div class="grid grid-cols-2 gap-2 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark p-1">
+<button id="andamento" class="w-full rounded bg-primary py-2.5 text-center text-sm font-semibold text-white">Em Andamento</button>
+<button class="w-full rounded py-2.5 text-center text-sm font-semibold text-text-light-secondary dark:text-text-dark-secondary">Concluído</button>
+</div>
+</div>
+-->
+
+</div>
+</section>
+<!-- Section 3: Equipe -->
+<section>
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-xl font-bold leading-tight tracking-tight mb-4">Equipe</h2>
+<div>
+
+  <!-- codigo abaixo vai clicar no botao submite e adicionar os operadores a uma lista javascript -->
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Operadores Envolvidos</p>
+<div class="relative flex items-center">
+<input id="operadortolist" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 pr-14 text-base font-normal leading-normal" placeholder="Nome do operador"/>
+<button onclick="addOperators()" id="submitnewoperator" class="absolute right-2 flex size-10 items-center justify-center rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+
+<div class="flex flex-wrap gap-2 pt-3" id="operatorsCards">
+
+<!-- base de um card do operador -->
+
+</div>
+</div>
+</section>
+<!-- Section 4: Informações do Cliente -->
+<section>
+<h2 class="text-text-light-primary dark:text-text-dark-primary text-xl font-bold leading-tight tracking-tight mb-4">Informações do Cliente</h2>
+<div class="space-y-4">
+<label class="flex flex-col"><p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">
+  Nome do Cliente
+</p>
+
+<input
+  list="clientes"
+  id="nomeCliente"
+  name="nomeCliente"
+  placeholder="Nome completo"
+  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg 
+         bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary 
+         border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary 
+         h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary 
+         p-4 text-base font-normal leading-normal"
+/>
+
+<datalist id="clientes">
+  <option value="Carlos Pereira">
+  <option value="Ana Souza">
+  <option value="João Silva">
+  <option value="Maria Oliveira">
+</datalist>
+
+
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">CPF/CPNJ</p>
+<input id="cpfcnpjcliente" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="CPF/CNPJ" value="0010010019" type="number"/>
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">Email do Cliente</p>
+<input id="emailcliente" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="exemplo@email.com" type="email" value="carlos.p@email.com"/>
+</label>
+<label class="flex flex-col">
+<p class="text-text-light-primary dark:text-text-dark-primary text-base font-medium leading-normal pb-2">WhatsApp</p>
+<input id="whatsappcliente" class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-surface-light dark:bg-surface-dark text-text-light-primary dark:text-text-dark-primary border border-border-light dark:border-border-dark focus:border-primary focus:ring-primary h-14 placeholder:text-text-light-secondary dark:placeholder:text-text-dark-secondary p-4 text-base font-normal leading-normal" placeholder="(00) 00000-0000" type="tel" value="(11) 98765-4321"/>
+</label>
+</div>
+</section>
+</main>
+</div>
+    </div>
+</body></html>

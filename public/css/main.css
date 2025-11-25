@@ -1,0 +1,18 @@
+.main{
+    
+    max-width: 1366px;
+    margin: 0 auto;
+}
+
+#operator{
+    overflow: hidden;
+    height: 100%;
+    max-height: 100%;
+}
+
+#loading{
+    visibility: hidden;
+}
+/* 
+
+*/

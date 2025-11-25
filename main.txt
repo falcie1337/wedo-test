@@ -1,0 +1,58 @@
+#PRECISA FAZER MELHOR ESTRUTURAÇÃO DO DATABASE
+- ORGANIZAÇÃO POR PASTA
+#PRECISA QUE AO INVES DO DOWNLOAD, OS ARQUIVOS FIQUEM ARMAZENADOS NO BANCO DE DADOS
+#PRECISA FAZER COM QUE AS ABAS LEIAM O BANCO DE DADOS E PEGUEM INFORMAÇÕES DE LÁ
+#PRECISA ARRUMAR JEITO DE UPLOAD DE FOTOS AO BANCO DE DADOS
+#RESPOSTAS DOM = COMO AVISAR QUANDO A FOTO FOI MANDA VIA CHAT E ETC
+
+O MAIS PLAUSIVEL É USAR FIREBASE/SQL LITE
+
+<!-- O CONTRA DESSE CODIGO AQUI É QUE O STORAGE DO FIREBASE É PAGO -->
+
+{
+  "projects": {
+    "project001": {
+      "name": "Residencial Alphaville",
+      "address": "Rua das Flores, 123 - São Paulo/SP",
+      "startDate": "2024-02-01",
+      "endDate": "2024-06-30",
+      "status": "active",
+      "client": {
+        "name": "Carlos Eduardo",
+        "document": "123.456.789-00",
+        "email": "carlos@email.com",
+        "whatsapp": "5511977777777"
+      },
+      "operators": ["operator001", "operator002"],
+      "createdAt": "2024-01-15T14:20:00Z"
+    }
+  },
+  "updates": {
+    "update001": {
+      "projectId": "project001",
+      "operatorId": "operator001",
+      "operatorName": "João Silva",
+      "message": "Fundação concluída",
+      "imageUrl": "https://storage.googleapis.com/.../image1.jpg",
+      "timestamp": "2024-01-20T16:45:00Z"
+    }
+  },
+  "operator_projects": {
+    "operator001": {
+      "project001": {
+        "projectName": "Residencial Alphaville",
+        "clientName": "Carlos Eduardo"
+      }
+    }
+  },
+  "reviews": {
+    "review001": {
+      "projectId": "project001",
+      "clientName": "Carlos Eduardo",
+      "projectName": "Residencial Alphaville",
+      "rating": 5,
+      "comments": "Excelente trabalho!",
+      "createdAt": "2024-07-01T10:00:00Z"
+    }
+  }
+}

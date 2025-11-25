@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema NoSQL Local</title>
+    <style>
+        /* Estilos gerais */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        /* Estilos dos formulários */
+        .form-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button.delete {
+            background-color: #e74c3c;
+        }
+
+        button.delete:hover {
+            background-color: #c0392b;
+        }
+
+        /* Estilos da tabela de dados */
+        .data-section {
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* Estilos para mensagens */
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Estilos para informações do banco */
+        .db-info {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .db-actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema NoSQL Local</h1>
+        
+        <!-- Seção de informações e ações do banco -->
+        <div class="db-info">
+            <div>
+                <h3>Banco de Dados Local</h3>
+                <p>Os dados são armazenados no localStorage do seu navegador.</p>
+            </div>
+            <div class="db-actions">
+                <button id="exportBtn">Exportar JSON</button>
+                <button id="importBtn">Importar JSON</button>
+                <button id="clearBtn" class="delete">Limpar Banco</button>
+            </div>
+        </div>
+
+        <!-- Seção para adicionar/editar documentos -->
+        <div class="form-section">
+            <h2 id="form-title">Adicionar Documento</h2>
+            <div id="message" class="message" style="display: none;"></div>
+            
+            <form id="document-form">
+                <div class="form-group">
+                    <label for="collection">Coleção:</label>
+                    <select id="collection" required>
+                        <option value="">Selecione uma coleção</option>
+                        <option value="users">Usuários</option>
+                        <option value="products">Produtos</option>
+                        <option value="orders">Pedidos</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="document-id">ID do Documento (opcional):</label>
+                    <input type="text" id="document-id" placeholder="Deixe em branco para gerar automaticamente">
+                </div>
+                
+                <div class="form-group">
+                    <label for="document-data">Dados do Documento (JSON):</label>
+                    <textarea id="document-data" placeholder='Exemplo: {"nome": "João", "idade": 30}' required></textarea>
+                </div>
+                
+                <button type="submit" id="submit-btn">Salvar Documento</button>
+                <button type="button" id="cancel-edit" style="display: none;">Cancelar Edição</button>
+            </form>
+        </div>
+
+        <!-- Seção para consultar documentos -->
+        <div class="form-section">
+            <h2>Consultar Documentos</h2>
+            
+            <div class="form-group">
+                <label for="query-collection">Coleção:</label>
+                <select id="query-collection">
+                    <option value="">Todas as coleções</option>
+                    <option value="users">Usuários</option>
+                    <option value="products">Produtos</option>
+                    <option value="orders">Pedidos</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="query-filter">Filtro (JSON):</label>
+                <input type="text" id="query-filter" placeholder='Exemplo: {"idade": 30}'>
+            </div>
+            
+            <button id="query-btn">Consultar</button>
+        </div>
+
+        <!-- Seção para exibir resultados -->
+        <div class="data-section">
+            <h2>Documentos</h2>
+            <div id="results-container"></div>
+        </div>
+    </div>
+
+    <!-- Input oculto para importação de arquivos -->
+    <input type="file" id="file-input" style="display: none;" accept=".json">
+
+    <script>
+        // ============================================
+        // SISTEMA NOSQL SIMPLES
+        // ============================================
+
+        // Classe principal do banco de dados NoSQL
+        class SimpleNoSQL {
+            constructor() {
+                // Inicializa o banco de dados carregando do localStorage
+                this.loadDatabase();
+            }
+
+            // Carrega o banco de dados do localStorage
+            loadDatabase() {
+                const dbJson = localStorage.getItem('simpleNoSQL');
+                if (dbJson) {
+                    this.database = JSON.parse(dbJson);
+                } else {
+                    // Se não existir, inicializa com um banco vazio
+                    this.database = {
+                        users: {},
+                        products: {},
+                        orders: {}
+                    };
+                    this.saveDatabase();
+                }
+            }
+
+            // Salva o banco de dados no localStorage
+            saveDatabase() {
+                localStorage.setItem('simpleNoSQL', JSON.stringify(this.database));
+            }
+
+            // Cria um documento em uma coleção
+            create(collection, document, id = null) {
+                // Verifica se a coleção existe, se não, cria
+                if (!this.database[collection]) {
+                    this.database[collection] = {};
+                }
+
+                // Gera um ID se não foi fornecido
+                if (!id) {
+                    id = this.generateId();
+                }
+
+                // Verifica se o ID já existe
+                if (this.database[collection][id]) {
+                    throw new Error(`Documento com ID ${id} já existe na coleção ${collection}`);
+                }
+
+                // Adiciona o documento à coleção
+                this.database[collection][id] = document;
+                this.saveDatabase();
+                return id;
+            }
+
+            // Lê documentos de uma coleção com filtro opcional
+            read(collection = null, filter = {}) {
+                let results = {};
+
+                // Se uma coleção específica foi fornecida
+                if (collection) {
+                    if (!this.database[collection]) {
+                        return {};
+                    }
+                    results[collection] = { ...this.database[collection] };
+                } else {
+                    // Se nenhuma coleção foi fornecida, retorna todas
+                    results = { ...this.database };
+                }
+
+                // Aplica filtros se fornecidos
+                if (Object.keys(filter).length > 0) {
+                    for (const coll in results) {
+                        for (const id in results[coll]) {
+                            const doc = results[coll][id];
+                            let match = true;
+
+                            // Verifica se o documento atende a todos os critérios do filtro
+                            for (const key in filter) {
+                                if (doc[key] !== filter[key]) {
+                                    match = false;
+                                    break;
+                                }
+                            }
+
+                            // Se não atender ao filtro, remove do resultado
+                            if (!match) {
+                                delete results[coll][id];
+                            }
+                        }
+
+                        // Remove coleções vazias do resultado
+                        if (Object.keys(results[coll]).length === 0) {
+                            delete results[coll];
+                        }
+                    }
+                }
+
+                return results;
+            }
+
+            // Atualiza um documento existente
+            update(collection, id, updates) {
+                // Verifica se a coleção e o documento existem
+                if (!this.database[collection]) {
+                    throw new Error(`Coleção ${collection} não existe`);
+                }
+
+                if (!this.database[collection][id]) {
+                    throw new Error(`Documento com ID ${id} não existe na coleção ${collection}`);
+                }
+
+                // Atualiza o documento
+                this.database[collection][id] = { ...this.database[collection][id], ...updates };
+                this.saveDatabase();
+                return true;
+            }
+
+            // Exclui um documento
+            delete(collection, id) {
+                // Verifica se a coleção e o documento existem
+                if (!this.database[collection]) {
+                    throw new Error(`Coleção ${collection} não existe`);
+                }
+
+                if (!this.database[collection][id]) {
+                    throw new Error(`Documento com ID ${id} não existe na coleção ${collection}`);
+                }
+
+                // Remove o documento
+                delete this.database[collection][id];
+                this.saveDatabase();
+                return true;
+            }
+
+            // Exporta o banco de dados completo como JSON
+            exportDatabase() {
+                return JSON.stringify(this.database, null, 2);
+            }
+
+            // Importa um banco de dados a partir de JSON
+            importDatabase(jsonData) {
+                try {
+                    const importedDb = JSON.parse(jsonData);
+                    this.database = importedDb;
+                    this.saveDatabase();
+                    return true;
+                } catch (error) {
+                    throw new Error('JSON inválido para importação');
+                }
+            }
+
+            // Limpa todo o banco de dados
+            clearDatabase() {
+                this.database = {
+                    users: {},
+                    products: {},
+                    orders: {}
+                };
+                this.saveDatabase();
+            }
+
+            // Gera um ID único
+            generateId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+        }
+
+        // ============================================
+        // INTERFACE DO USUÁRIO E INTERAÇÃO
+        // ============================================
+
+        // Inicializa o banco de dados
+        const db = new SimpleNoSQL();
+
+        // Elementos DOM
+        const documentForm = document.getElementById('document-form');
+        const collectionSelect = document.getElementById('collection');
+        const documentIdInput = document.getElementById('document-id');
+        const documentDataTextarea = document.getElementById('document-data');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelEditBtn = document.getElementById('cancel-edit');
+        const formTitle = document.getElementById('form-title');
+        const messageDiv = document.getElementById('message');
+        const queryCollectionSelect = document.getElementById('query-collection');
+        const queryFilterInput = document.getElementById('query-filter');
+        const queryBtn = document.getElementById('query-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileInput = document.getElementById('file-input');
+
+        // Variáveis para controle de estado
+        let isEditing = false;
+        let currentEditId = null;
+        let currentEditCollection = null;
+
+        // Função para exibir mensagens
+        function showMessage(text, type = 'success') {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            // Esconde a mensagem após 5 segundos
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Função para validar JSON
+        function isValidJSON(str) {
+            try {
+                JSON.parse(str);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // Função para processar o envio do formulário
+        documentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const collection = collectionSelect.value;
+            const documentId = documentIdInput.value.trim();
+            const documentData = documentDataTextarea.value.trim();
+            
+            // Validações
+            if (!collection) {
+                showMessage('Por favor, selecione uma coleção', 'error');
+                return;
+            }
+            
+            if (!isValidJSON(documentData)) {
+                showMessage('Os dados do documento devem ser um JSON válido', 'error');
+                return;
+            }
+            
+            try {
+                const parsedData = JSON.parse(documentData);
+                
+                if (isEditing) {
+                    // Modo edição - atualiza o documento
+                    db.update(currentEditCollection, currentEditId, parsedData);
+                    showMessage('Documento atualizado com sucesso!');
+                    cancelEdit();
+                } else {
+                    // Modo criação - adiciona novo documento
+                    const id = db.create(collection, parsedData, documentId || null);
+                    showMessage(`Documento criado com sucesso! ID: ${id}`);
+                    documentForm.reset();
+                }
+                
+                // Atualiza a exibição dos resultados
+                performQuery();
+            } catch (error) {
+                showMessage(`Erro: ${error.message}`, 'error');
+            }
+        });
+
+        // Função para executar uma consulta
+        function performQuery() {
+            const collection = queryCollectionSelect.value || null;
+            const filterText = queryFilterInput.value.trim();
+            let filter = {};
+            
+            if (filterText && isValidJSON(filterText)) {
+                filter = JSON.parse(filterText);
+            } else if (filterText) {
+                showMessage('O filtro deve ser um JSON válido', 'error');
+                return;
+            }
+            
+            const results = db.read(collection, filter);
+            displayResults(results);
+        }
+
+        // Função para exibir os resultados da consulta
+        function displayResults(results) {
+            if (Object.keys(results).length === 0) {
+                resultsContainer.innerHTML = '<p>Nenhum documento encontrado.</p>';
+                return;
+            }
+            
+            let html = '';
+            
+            for (const collection in results) {
+                html += `<h3>Coleção: ${collection}</h3>`;
+                html += '<table>';
+                html += '<thead><tr><th>ID</th><th>Dados</th><th>Ações</th></tr></thead>';
+                html += '<tbody>';
+                
+                for (const id in results[collection]) {
+                    html += `<tr>`;
+                    html += `<td>${id}</td>`;
+                    html += `<td><pre>${JSON.stringify(results[collection][id], null, 2)}</pre></td>`;
+                    html += `<td class="actions">
+                                <button onclick="editDocument('${collection}', '${id}')">Editar</button>
+                                <button onclick="deleteDocument('${collection}', '${id}')" class="delete">Excluir</button>
+                             </td>`;
+                    html += `</tr>`;
+                }
+                
+                html += '</tbody></table>';
+            }
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        // Função para editar um documento
+        window.editDocument = function(collection, id) {
+            const document = db.read(collection)[collection][id];
+            
+            // Preenche o formulário com os dados do documento
+            collectionSelect.value = collection;
+            documentIdInput.value = id;
+            documentDataTextarea.value = JSON.stringify(document, null, 2);
+            
+            // Altera para modo edição
+            isEditing = true;
+            currentEditId = id;
+            currentEditCollection = collection;
+            formTitle.textContent = 'Editando Documento';
+            submitBtn.textContent = 'Atualizar Documento';
+            cancelEditBtn.style.display = 'inline-block';
+            
+            // Rola até o formulário
+            documentForm.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Função para cancelar a edição
+        function cancelEdit() {
+            isEditing = false;
+            currentEditId = null;
+            currentEditCollection = null;
+            formTitle.textContent = 'Adicionar Documento';
+            submitBtn.textContent = 'Salvar Documento';
+            cancelEditBtn.style.display = 'none';
+            documentForm.reset();
+        }
+
+        // Função para excluir um documento
+        window.deleteDocument = function(collection, id) {
+            if (confirm(`Tem certeza que deseja excluir o documento ${id} da coleção ${collection}?`)) {
+                try {
+                    db.delete(collection, id);
+                    showMessage('Documento excluído com sucesso!');
+                    performQuery();
+                } catch (error) {
+                    showMessage(`Erro: ${error.message}`, 'error');
+                }
+            }
+        };
+
+        // Função para exportar o banco de dados
+        exportBtn.addEventListener('click', function() {
+            const data = db.exportDatabase();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'simpleNoSQL-database.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showMessage('Banco de dados exportado com sucesso!');
+        });
+
+        // Função para importar um banco de dados
+        importBtn.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    db.importDatabase(event.target.result);
+                    showMessage('Banco de dados importado com sucesso!');
+                    performQuery();
+                } catch (error) {
+                    showMessage(`Erro: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsText(file);
+            
+            // Limpa o input para permitir a seleção do mesmo arquivo novamente
+            fileInput.value = '';
+        });
+
+        // Função para limpar o banco de dados
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja limpar todo o banco de dados? Esta ação não pode ser desfeita.')) {
+                db.clearDatabase();
+                showMessage('Banco de dados limpo com sucesso!');
+                performQuery();
+            }
+        });
+
+        // Event listeners
+        queryBtn.addEventListener('click', performQuery);
+        cancelEditBtn.addEventListener('click', cancelEdit);
+
+        // Executa uma consulta inicial ao carregar a página
+        performQuery();
+    </script>
+</body>
+</html>
