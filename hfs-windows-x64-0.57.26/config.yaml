@@ -1,5 +1,0 @@
-version: 0.57.26
-vfs:
-  children:
-    - source: C:\Users\HUB LIGHTHOUSE\Documents\JUAN
-base_url: http://10.0.101.66
